@@ -1,445 +1,386 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Phone Packages for Smb - Light</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Phone Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080B; --card:#141419; --card-2:#1C1C23; --line:#26262F; --ink:#F4F4F7; --ink-2:#8E8E9A;
+  --accent:#0A84FF; --accent-2:#3D9BFF; --ok:#32D74B; --hot:#FF453A;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{height:100%;background:var(--bg);color:var(--ink);font-family:'Inter Tight',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow:hidden;font-feature-settings:"tnum" 1}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f2f2f7;
-            color: #1c1c1e;
-        }
+.app{position:relative;max-width:440px;height:100%;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
 
-        header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 20px;
-            padding-top: env(safe-area-inset-top);
-            height: calc(65px + env(safe-area-inset-top));
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            border-bottom: 0.5px solid #d1d1d6;
-        }
+/* header */
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 18px 10px}
+.page-title{flex:1;font-size:30px;font-weight:800;letter-spacing:-.9px}
+.icon-btn{width:44px;height:44px;border-radius:50%;background:var(--card);display:grid;place-items:center;position:relative;border:1px solid var(--line)}
+.icon-btn svg{width:21px;height:21px}
+.count{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--hot);color:#fff;
+  font-size:11px;font-weight:700;display:grid;place-items:center;border:2px solid var(--bg);transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.count.on{transform:scale(1)}
+.icon-btn.bump{animation:bump .45s ease}
+@keyframes bump{30%{transform:scale(1.22) rotate(-8deg)}60%{transform:scale(.93)}100%{transform:none}}
 
-        header span {
-            font-weight: 700;
-            font-size: 1.1rem;
-            letter-spacing: -0.5px;
-            color: #1c1c1e;
-        }
+.sub-bar{display:flex;gap:8px;padding:0 18px 12px;overflow-x:auto;scrollbar-width:none}
+.sub-bar::-webkit-scrollbar{display:none}
+.pill{flex-shrink:0;font-size:12.5px;font-weight:600;color:var(--ink-2);background:var(--card);border:1px solid var(--line);padding:7px 12px;border-radius:20px}
+.pill b{color:var(--ink);font-weight:600}
 
-        .cart-icon {
-            position: absolute;
-            right: 20px;
-            bottom: 18px;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-        }
+.scroll{flex:1;overflow-y:auto;padding:4px 16px 28px}
 
-        .cart-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: #1c1c1e;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+/* phone card */
+.phone{background:var(--card);border:1px solid var(--line);border-radius:22px;margin-bottom:12px;overflow:hidden;
+  transition:border-color .25s,box-shadow .25s;opacity:0;transform:translateY(16px);animation:enter .5s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes enter{to{opacity:1;transform:none}}
+.phone.open{border-color:#3A3A46}
+.phone.in-cart{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 16px 40px -20px rgba(10,132,255,.6)}
+.head{display:flex;align-items:stretch;min-height:178px;cursor:pointer}
+.head:active .shot img,.head:active .shot svg{transform:scale(.96)}
+.shot{position:relative;width:44%;flex-shrink:0;display:grid;place-items:center;background:radial-gradient(90% 70% at 50% 45%,#23232D 0%,#121217 75%)}
+.shot img,.shot svg{height:84%;max-width:88%;object-fit:contain;transition:transform .3s;filter:drop-shadow(0 14px 18px rgba(0,0,0,.6))}
+.badge{position:absolute;left:10px;top:10px;font-size:11px;font-weight:700;padding:4px 8px;border-radius:8px;background:var(--hot);color:#fff}
+.badge.new{background:var(--accent)}
+.info{flex:1;padding:16px 14px 14px 14px;display:flex;flex-direction:column;min-width:0}
+.info h3{font-size:17px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
+.colorline{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);margin-top:5px}
+.colorline i{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.25)}
+.specs{font-size:12px;color:var(--ink-2);margin-top:8px;line-height:1.5}
+.stock{font-size:12px;color:var(--ok);margin-top:6px;font-weight:600}
+.price-row{margin-top:auto;padding-top:10px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.price-row .from{font-size:11.5px;color:var(--ink-2);display:block}
+.price-row strong{font-size:21px;font-weight:800;letter-spacing:-.5px}
+.price-row s{font-size:12px;color:var(--ink-2);margin-left:4px}
+.chev{width:30px;height:30px;border-radius:50%;background:var(--card-2);display:grid;place-items:center;flex-shrink:0;transition:transform .3s}
+.chev svg{width:15px;height:15px}
+.phone.open .chev{transform:rotate(180deg)}
+.in-cart-tag{display:none;font-size:11.5px;font-weight:700;color:var(--accent-2);margin-top:6px}
+.phone.in-cart .in-cart-tag{display:block}
 
-        #cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff3b30;
-            color: white;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 11px;
-            font-weight: bold;
-            display: none;
-        }
+/* config panel */
+.config{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s cubic-bezier(.2,.8,.2,1)}
+.phone.open .config{grid-template-rows:1fr}
+.config-inner{overflow:hidden}
+.config-body{padding:4px 14px 16px;border-top:1px solid var(--line)}
+.group-title{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2);margin:14px 2px 8px;font-weight:500}
+.group-title b{color:var(--ink);font-weight:600}
+.opts{display:grid;gap:8px}
+.opts.mem{grid-template-columns:repeat(4,1fr)}
+.opts.sim{grid-template-columns:1fr}
+.opt{background:var(--card-2);border:1.5px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center;transition:border-color .2s,background .2s,transform .15s}
+.opt:active{transform:scale(.96)}
+.opt b{display:block;font-size:14.5px;font-weight:700}
+.opt small{display:block;font-size:11.5px;color:var(--ink-2);margin-top:3px}
+.opts.sim .opt{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px}
+.opts.sim .opt .sim-ic{display:flex;gap:4px;flex-shrink:0}
+.opts.sim .opt .sim-ic i{width:14px;height:19px;border-radius:2px 6px 2px 2px;border:1.5px solid var(--ink-2)}
+.opts.sim .opt .sim-ic i.e{border-style:dashed}
+.opts.sim .opt .txt{flex:1}
+.opts.sim .opt small{margin-top:1px}
+.opts.sim .opt em{font-style:normal;font-size:12.5px;color:var(--ink-2);font-weight:600}
+.opt.on{border-color:var(--accent);background:rgba(10,132,255,.1)}
+.opt.on .sim-ic i{border-color:var(--accent-2)}
+.summary{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:12px 14px;background:var(--card-2);border-radius:14px}
+.summary span{font-size:12.5px;color:var(--ink-2)}
+.summary strong{font-size:22px;font-weight:800;letter-spacing:-.5px;display:inline-block}
+.summary strong.tick{animation:tick .3s ease}
+@keyframes tick{40%{transform:translateY(-3px);color:var(--accent-2)}}
+.monthly{font-size:12px;color:var(--ink-2);text-align:right}
+.add-btn{width:100%;margin-top:12px;background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;transition:transform .12s,background .2s}
+.add-btn:active{transform:scale(.98)}
+.remove-btn{width:100%;margin-top:8px;color:var(--hot);font-size:14px;font-weight:600;padding:8px;display:none}
+.phone.in-cart .remove-btn{display:block}
 
-        .container {
-            padding: calc(85px + env(safe-area-inset-top)) 15px 40px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+/* flyer */
+.flyer{position:fixed;z-index:950;width:44px;pointer-events:none;transition:transform .7s cubic-bezier(.5,-.3,.6,1),opacity .7s}
+.flyer img,.flyer svg{width:100%;height:auto;display:block}
 
-        .phone-wrapper {
-            display: flex;
-            flex-direction: column;
-        }
+/* cart sheet */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.65);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;backdrop-filter:blur(4px)}
+.scrim.open{opacity:1;pointer-events:auto}
+.cart{position:absolute;left:0;right:0;bottom:0;max-height:88%;background:var(--card);border-top:1px solid var(--line);border-radius:28px 28px 0 0;z-index:51;
+  transform:translateY(105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:10px 18px 18px}
+.cart.open{transform:none}
+.grab{width:40px;height:5px;border-radius:5px;background:#3A3A46;margin:0 auto 14px}
+.cart h2{font-size:26px;font-weight:800;letter-spacing:-.6px}
+.cart-items{overflow-y:auto;margin:14px 0 8px;flex:1}
+.ci{display:flex;align-items:center;gap:12px;background:var(--card-2);padding:10px;border-radius:16px;margin-bottom:8px;animation:enter .35s ease forwards;opacity:0}
+.ci .thumb{width:54px;height:62px;border-radius:12px;background:#0F0F14;display:grid;place-items:center;flex-shrink:0}
+.ci .thumb img,.ci .thumb svg{height:52px;max-width:46px;object-fit:contain}
+.ci .mid{flex:1;min-width:0}
+.ci b{font-size:14.5px;display:block}
+.ci small{font-size:12.5px;color:var(--ink-2);display:block;margin-top:2px}
+.ci .p{font-weight:700;font-size:15px;text-align:right}
+.ci .x{display:block;margin:4px 0 0 auto;font-size:12px;color:var(--hot);font-weight:600}
+.empty{text-align:center;padding:30px 10px;color:var(--ink-2);font-size:14px}
+.empty div{font-size:40px;margin-bottom:8px}
+.totals{border-top:1px solid var(--line);padding-top:12px}
+.tr{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
+.tr span{color:var(--ink-2)}
+.tr .green{color:var(--ok);font-weight:600}
+.tr.big b{font-size:21px;font-weight:800}
+.checkout{width:100%;margin-top:12px;background:var(--accent);color:#fff;border-radius:16px;padding:17px;font-size:16.5px;font-weight:700;transition:transform .12s,opacity .2s}
+.checkout:active{transform:scale(.98)}
+.checkout:disabled{opacity:.4}
 
-        .phone-card {
-            background: #ffffff;
-            border-radius: 18px;
-            height: 180px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            cursor: pointer;
-            border: 1px solid #e5e5ea;
-            overflow: hidden;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.25s ease;
-        }
+/* status modal */
+#modal{position:absolute;inset:0;z-index:80;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:24px}
+#modal.show{display:flex}
+.status{width:100%;max-width:300px;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:30px 24px;text-align:center;animation:pop .35s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+.ring{width:72px;height:72px;margin:0 auto 18px;position:relative}
+.ring .spin{position:absolute;inset:0;border-radius:50%;border:5px solid #26262F;border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ring svg{position:absolute;inset:0;width:72px;height:72px;display:none}
+.ring svg circle{fill:var(--ok)}
+.ring svg path{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40}
+.status.done .spin{display:none}
+.status.done .ring svg{display:block;animation:pop .35s ease}
+.status.done .ring svg path{animation:draw .45s .15s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.status h3{font-size:20px;font-weight:800}
+.status p{font-size:13.5px;color:var(--ink-2);margin-top:6px;line-height:1.45}
+.status .ok-btn{display:none;width:100%;margin-top:18px;background:var(--card-2);border:1px solid var(--line);border-radius:14px;padding:13px;font-weight:700}
+.status.done .ok-btn{display:block}
 
-        .phone-card:active { transform: scale(0.97); }
-
-        .phone-card.selected {
-            border: 2.5px solid #007aff;
-            background-color: #f0f6ff;
-        }
-
-        .phone-wrapper.open .phone-card {
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-
-        .img-left {
-            width: 50%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f2f2f7;
-        }
-
-        .img-left img {
-            height: 85%;
-            max-width: 90%;
-            object-fit: contain;
-        }
-
-        .text-right {
-            width: 50%;
-            padding: 0 15px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #1c1c1e;
-        }
-
-        .size-options {
-            max-height: 0;
-            overflow: hidden;
-            background: #ffffff;
-            border: 0 solid #e5e5ea;
-            border-bottom-left-radius: 18px;
-            border-bottom-right-radius: 18px;
-            transition: max-height 0.3s ease, border-width 0.3s ease;
-        }
-
-        .phone-wrapper.open .size-options {
-            max-height: 340px;
-            border-width: 0 1px 1px 1px;
-        }
-
-        .size-options-inner {
-            display: flex;
-            flex-direction: column;
-            padding: 8px 12px 12px 12px;
-            gap: 8px;
-        }
-
-        .size-option {
-            background: #f2f2f7;
-            color: #1c1c1e;
-            border: 1px solid #d1d1d6;
-            border-radius: 12px;
-            padding: 18px 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: background 0.15s ease, transform 0.15s ease;
-        }
-
-        .size-option:active {
-            transform: scale(0.97);
-            background: #007aff;
-            color: #fff;
-        }
-
-        /* Cart view */
-        #cart-view {
-            display: none;
-            padding: calc(85px + env(safe-area-inset-top)) 20px 100px 20px;
-        }
-
-        .cart-item {
-            display: flex;
-            align-items: center;
-            background: #ffffff;
-            margin-bottom: 10px;
-            padding: 12px;
-            border-radius: 14px;
-            border: 0.5px solid #e5e5ea;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        }
-
-        .cart-item img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            margin-right: 15px;
-            background: #f2f2f7;
-            border-radius: 8px;
-        }
-
-        .cart-item-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cart-item-text small {
-            color: #6e6e73;
-            font-weight: 500;
-            margin-top: 2px;
-        }
-
-        .btn-insights {
-            -webkit-appearance: none;
-            background: #007aff;
-            color: white;
-            border: none;
-            padding: 18px;
-            width: 100%;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-top: 25px;
-            box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
-            cursor: pointer;
-        }
-
-        /* Modal */
-        #modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #status-box {
-            background: #007aff;
-            color: white;
-            padding: 35px;
-            border-radius: 24px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            min-width: 220px;
-            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        #status-box .done-icon {
-            font-size: 64px;
-        }
-
-        #status-box p {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.7); opacity: 0; }
-            to   { transform: scale(1);   opacity: 1; }
-        }
-    </style>
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
 </head>
 <body>
+<div class="app">
 
-<header>
-    <span>CHOOSE ITEMS</span>
-    <div class="cart-icon" onclick="showCart()">
-        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        <span id="cart-count">0</span>
+  <header class="topbar">
+    <h1 class="page-title">Choose phone</h1>
+    <button class="icon-btn" id="cartBtn" onclick="openCart()" aria-label="Open cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="count" id="count">0</span>
+    </button>
+  </header>
+
+  <div class="sub-bar">
+    <span class="pill">🚚 <b>Free delivery</b> tomorrow</span>
+    <span class="pill">🛡️ <b>2‑year</b> warranty</span>
+    <span class="pill">💳 <b>0%</b> installments</span>
+  </div>
+
+  <main class="scroll" id="list"></main>
+
+  <div class="scrim" id="scrim" onclick="closeCart()"></div>
+  <section class="cart" id="cart" aria-label="Cart">
+    <div class="grab"></div>
+    <h2>Cart</h2>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="totals">
+      <div class="tr"><span>Subtotal</span><b id="sub">$0</b></div>
+      <div class="tr"><span>Savings</span><b class="green" id="save">−$0</b></div>
+      <div class="tr"><span>Delivery</span><b class="green">Free</b></div>
+      <div class="tr big"><span>Total</span><b id="tot">$0</b></div>
     </div>
-</header>
+    <button class="checkout" id="checkout" onclick="checkout()">Checkout</button>
+  </section>
 
-<div class="container" id="phone-list">
-
-    <div class="phone-wrapper" id="wrapper-1">
-        <div class="phone-card" onclick="handleCardClick('wrapper-1', 'Blue Phone 15 Pro', 't1.png')">
-            <div class="img-left"><img src="t1.png" alt="Blue Phone 15 Pro"></div>
-            <div class="text-right">Blue Phone 15 Pro</div>
-        </div>
-        <div class="size-options">
-            <div class="size-options-inner">
-                <div class="size-option" onclick="selectSize(event,'wrapper-1','Blue Phone 15 Pro','t1.png','128 GB')">128 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-1','Blue Phone 15 Pro','t1.png','256 GB')">256 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-1','Blue Phone 15 Pro','t1.png','512 GB')">512 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-1','Blue Phone 15 Pro','t1.png','1 TB')">1 TB</div>
-            </div>
-        </div>
+  <div id="modal">
+    <div class="status" id="status">
+      <div class="ring"><div class="spin"></div>
+        <svg viewBox="0 0 72 72"><circle cx="36" cy="36" r="36"/><path d="M22 37l9 9 19-20"/></svg>
+      </div>
+      <h3 id="stTitle">Processing…</h3>
+      <p id="stText">Confirming payment and reserving your phones.</p>
+      <button class="ok-btn" onclick="closeModal()">Done</button>
     </div>
-
-    <div class="phone-wrapper" id="wrapper-2">
-        <div class="phone-card" onclick="handleCardClick('wrapper-2', 'White Phone 16 Pro', 't2.png')">
-            <div class="img-left"><img src="t2.png" alt="White Phone 16 Pro"></div>
-            <div class="text-right">White Phone 16 Pro</div>
-        </div>
-        <div class="size-options">
-            <div class="size-options-inner">
-                <div class="size-option" onclick="selectSize(event,'wrapper-2','White Phone 16 Pro','t2.png','128 GB')">128 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-2','White Phone 16 Pro','t2.png','256 GB')">256 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-2','White Phone 16 Pro','t2.png','512 GB')">512 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-2','White Phone 16 Pro','t2.png','1 TB')">1 TB</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="phone-wrapper" id="wrapper-3">
-        <div class="phone-card" onclick="handleCardClick('wrapper-3', 'Pink Phone 17 Pro', 't3.png')">
-            <div class="img-left"><img src="t3.png" alt="Pink Phone 17 Pro"></div>
-            <div class="text-right">Pink Phone 17 Pro</div>
-        </div>
-        <div class="size-options">
-            <div class="size-options-inner">
-                <div class="size-option" onclick="selectSize(event,'wrapper-3','Pink Phone 17 Pro','t3.png','128 GB')">128 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-3','Pink Phone 17 Pro','t3.png','256 GB')">256 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-3','Pink Phone 17 Pro','t3.png','512 GB')">512 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-3','Pink Phone 17 Pro','t3.png','1 TB')">1 TB</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="phone-wrapper" id="wrapper-4">
-        <div class="phone-card" onclick="handleCardClick('wrapper-4', 'Black Phone 18 Pro', 't4.png')">
-            <div class="img-left"><img src="t4.png" alt="Black Phone 18 Pro"></div>
-            <div class="text-right">Black Phone 18 Pro</div>
-        </div>
-        <div class="size-options">
-            <div class="size-options-inner">
-                <div class="size-option" onclick="selectSize(event,'wrapper-4','Black Phone 18 Pro','t4.png','128 GB')">128 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-4','Black Phone 18 Pro','t4.png','256 GB')">256 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-4','Black Phone 18 Pro','t4.png','512 GB')">512 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-4','Black Phone 18 Pro','t4.png','1 TB')">1 TB</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="phone-wrapper" id="wrapper-5">
-        <div class="phone-card" onclick="handleCardClick('wrapper-5', 'Yellow Phone 19 Pro', 't5.png')">
-            <div class="img-left"><img src="t5.png" alt="Yellow Phone 19 Pro"></div>
-            <div class="text-right">Yellow Phone 19 Pro</div>
-        </div>
-        <div class="size-options">
-            <div class="size-options-inner">
-                <div class="size-option" onclick="selectSize(event,'wrapper-5','Yellow Phone 19 Pro','t5.png','128 GB')">128 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-5','Yellow Phone 19 Pro','t5.png','256 GB')">256 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-5','Yellow Phone 19 Pro','t5.png','512 GB')">512 GB</div>
-                <div class="size-option" onclick="selectSize(event,'wrapper-5','Yellow Phone 19 Pro','t5.png','1 TB')">1 TB</div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<div id="cart-view">
-    <h2 style="font-weight:800;font-size:2.2rem;margin-bottom:20px;color:#1c1c1e;">Cart</h2>
-    <div id="cart-items-container"></div>
-    <button class="btn-insights" onclick="showInsights()">Get Insights</button>
-</div>
-
-<div id="modal-overlay" onclick="closeModal()">
-    <div id="status-box">
-        <div class="done-icon">✅</div>
-        <p>Processing...</p>
-    </div>
+  </div>
 </div>
 
 <script>
-    let selectedPhones = [];
-    let openWrapperId = null;
+// Фото телефонів: t1.png … t5.png лежать у тій самій папці, що й index.html
+var IMG_PATH = '';
 
-    function handleCardClick(wrapperId, name, imgSrc) {
-        const isSelected = selectedPhones.some(p => p.wrapperId === wrapperId);
-        if (isSelected) { removePhone(wrapperId); return; }
+var MEM = [
+  {id:'128', label:'128 GB', add:0},
+  {id:'256', label:'256 GB', add:100},
+  {id:'512', label:'512 GB', add:300},
+  {id:'1tb', label:'1 TB',   add:500}
+];
+var SIM = [
+  {id:'nano-esim', label:'Nano‑SIM + eSIM', desc:'1 physical slot · up to 8 eSIMs', slots:['','e'], add:0},
+  {id:'dual',      label:'Dual Nano‑SIM',   desc:'2 physical slots + eSIM',        slots:['',''], add:40},
+  {id:'esim',      label:'eSIM only',       desc:'No physical slot',               slots:['e'],   add:-20}
+];
+var phones = [
+  {id:1, name:'Blue Phone 15 Pro',   color:'Pacific Blue',  dot:'#3E5F8A', base:799,  old:899,  badge:'−11%', specs:'6.1″ OLED · 48 MP · 3,274 mAh'},
+  {id:2, name:'White Phone 16 Pro',  color:'Natural White', dot:'#E9E6DF', base:899,  old:null, badge:null,   specs:'6.3″ OLED 120 Hz · 48 MP · 3,582 mAh'},
+  {id:3, name:'Pink Phone 17 Pro',   color:'Rose Pink',     dot:'#E8B4BC', base:999,  old:1099, badge:'−9%',  specs:'6.3″ OLED 120 Hz · 48 MP ×3 · 4,000 mAh'},
+  {id:4, name:'Black Phone 18 Pro',  color:'Space Black',   dot:'#1D1D1F', base:1099, old:null, badge:'New',  specs:'6.5″ OLED 120 Hz · 200 MP · 4,500 mAh'},
+  {id:5, name:'Yellow Phone 19 Pro', color:'Sunset Yellow', dot:'#F2D16B', base:1199, old:null, badge:'New',  specs:'6.7″ OLED 144 Hz · 200 MP · 5,000 mAh'}
+];
+var choice = {}, cart = {}, openId = null;
+phones.forEach(function(p){ choice[p.id] = {mem:'256', sim:'nano-esim'}; });
 
-        if (openWrapperId && openWrapperId !== wrapperId) {
-            document.getElementById(openWrapperId).classList.remove('open');
-        }
-        const wrapper = document.getElementById(wrapperId);
-        const isOpen = wrapper.classList.contains('open');
-        if (isOpen) { wrapper.classList.remove('open'); openWrapperId = null; }
-        else { wrapper.classList.add('open'); openWrapperId = wrapperId; }
-    }
+var money = function(v){ return '$' + v.toLocaleString('en-US'); };
+var byId = function(arr, id){ return arr.filter(function(x){ return x.id===id; })[0]; };
+function priceOf(p, c){ return p.base + byId(MEM, c.mem).add + byId(SIM, c.sim).add; }
+function oldOf(p, c){ return p.old ? p.old + byId(MEM, c.mem).add + byId(SIM, c.sim).add : null; }
 
-    function selectSize(event, wrapperId, name, imgSrc, size) {
-        event.stopPropagation();
-        selectedPhones.push({ name, imgSrc, size, wrapperId });
-        const wrapper = document.getElementById(wrapperId);
-        wrapper.classList.remove('open');
-        wrapper.querySelector('.phone-card').classList.add('selected');
-        openWrapperId = null;
-        updateCartCount();
-    }
+// Запасний SVG, якщо файл tN.png не знайдено
+function phoneSVG(p){
+  return '<svg viewBox="0 0 80 160"><rect x="4" y="2" width="72" height="156" rx="14" fill="'+p.dot+'"/>' +
+    '<rect x="8" y="6" width="64" height="148" rx="11" fill="#0B0B10"/>' +
+    '<rect x="30" y="12" width="20" height="6" rx="3" fill="#000"/>' +
+    '<rect x="12" y="24" width="56" height="34" rx="6" fill="#1E2A44" opacity=".8"/></svg>';
+}
+function phoneImg(p){
+  return '<img src="'+IMG_PATH+'t'+p.id+'.png" alt="'+p.name+'" onerror="imgFail(this,'+p.id+')">';
+}
+function imgFail(el, id){ el.outerHTML = phoneSVG(byId(phones, id)); }
 
-    function removePhone(wrapperId) {
-        selectedPhones = selectedPhones.filter(p => p.wrapperId !== wrapperId);
-        const wrapper = document.getElementById(wrapperId);
-        wrapper.classList.remove('open');
-        wrapper.querySelector('.phone-card').classList.remove('selected');
-        if (openWrapperId === wrapperId) openWrapperId = null;
-        updateCartCount();
-    }
+function render(){
+  document.getElementById('list').innerHTML = phones.map(function(p, i){
+    var c = choice[p.id];
+    var memOpts = MEM.map(function(m){
+      return '<button class="opt'+(c.mem===m.id?' on':'')+'" onclick="pick(event,'+p.id+',\'mem\',\''+m.id+'\')"><b>'+m.label+'</b><small>'+(m.add?'+'+money(m.add):'Base')+'</small></button>';
+    }).join('');
+    var simOpts = SIM.map(function(s){
+      return '<button class="opt'+(c.sim===s.id?' on':'')+'" onclick="pick(event,'+p.id+',\'sim\',\''+s.id+'\')">' +
+        '<span class="sim-ic">'+s.slots.map(function(t){ return '<i class="'+t+'"></i>'; }).join('')+'</span>' +
+        '<span class="txt"><b>'+s.label+'</b><small>'+s.desc+'</small></span>' +
+        '<em>'+(s.add>0?'+'+money(s.add):s.add<0?'−'+money(-s.add):'Included')+'</em></button>';
+    }).join('');
+    return '<article class="phone'+(openId===p.id?' open':'')+(cart[p.id]?' in-cart':'')+'" id="ph'+p.id+'" style="animation-delay:'+(i*70)+'ms">' +
+      '<div class="head" onclick="toggle('+p.id+')">' +
+        '<div class="shot">'+(p.badge?'<span class="badge'+(p.badge==='New'?' new':'')+'">'+p.badge+'</span>':'')+phoneImg(p)+'</div>' +
+        '<div class="info"><h3>'+p.name+'</h3>' +
+          '<div class="colorline"><i style="background:'+p.dot+'"></i>'+p.color+'</div>' +
+          '<div class="specs">'+p.specs+'</div>' +
+          '<div class="stock">● In stock</div>' +
+          '<div class="in-cart-tag">✓ In cart</div>' +
+          '<div class="price-row"><div><span class="from">from</span><strong>'+money(p.base)+'</strong>'+(p.old?'<s>'+money(p.old)+'</s>':'')+'</div>' +
+          '<span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div>' +
+        '</div></div>' +
+      '<div class="config"><div class="config-inner"><div class="config-body">' +
+        '<div class="group-title"><span>Storage</span><b id="memL'+p.id+'">'+byId(MEM,c.mem).label+'</b></div>' +
+        '<div class="opts mem">'+memOpts+'</div>' +
+        '<div class="group-title"><span>SIM card slots</span><b id="simL'+p.id+'">'+byId(SIM,c.sim).label+'</b></div>' +
+        '<div class="opts sim">'+simOpts+'</div>' +
+        '<div class="summary"><div><span>Your price</span><br><strong id="pr'+p.id+'">'+money(priceOf(p,c))+'</strong></div>' +
+          '<div class="monthly">or <b id="mo'+p.id+'">'+money(Math.ceil(priceOf(p,c)/24))+'</b>/mo<br>for 24 months</div></div>' +
+        '<button class="add-btn" onclick="addToCart(event,'+p.id+')">'+(cart[p.id]?'Update cart':'Add to cart')+'</button>' +
+        '<button class="remove-btn" onclick="removeFromCart(event,'+p.id+')">Remove from cart</button>' +
+      '</div></div></div></article>';
+  }).join('');
+  document.querySelectorAll('.phone').forEach(function(el){ el.style.animation = rendered ? 'none' : ''; if (rendered){ el.style.opacity = 1; el.style.transform = 'none'; } });
+}
+var rendered = false;
 
-    function updateCartCount() {
-        const countTag = document.getElementById('cart-count');
-        countTag.innerText = selectedPhones.length;
-        countTag.style.display = selectedPhones.length > 0 ? 'block' : 'none';
-    }
+function toggle(id){
+  openId = openId === id ? null : id;
+  document.querySelectorAll('.phone').forEach(function(el){ el.classList.toggle('open', el.id === 'ph'+openId); });
+  if (openId){ setTimeout(function(){ document.getElementById('ph'+id).scrollIntoView({behavior:'smooth', block:'nearest'}); }, 200); }
+}
 
-    function showCart() {
-        window.scrollTo(0, 0);
-        document.getElementById('phone-list').style.display = 'none';
-        document.getElementById('cart-view').style.display = 'block';
-        const container = document.getElementById('cart-items-container');
-        container.innerHTML = '';
-        if (!selectedPhones.length) {
-            container.innerHTML = '<p style="color:#6e6e73;">Cart is empty</p>';
-        }
-        selectedPhones.forEach(phone => {
-            const item = document.createElement('div');
-            item.className = 'cart-item';
-            item.innerHTML = `<img src="${phone.imgSrc}" alt="${phone.name}"><div class="cart-item-text"><b>${phone.name}</b><small>${phone.size}</small></div>`;
-            container.appendChild(item);
-        });
-    }
+function pick(e, id, key, val){
+  e.stopPropagation();
+  choice[id][key] = val;
+  var card = document.getElementById('ph'+id);
+  card.querySelectorAll('.opts.'+key+' .opt').forEach(function(b){ b.classList.toggle('on', b.getAttribute('onclick').indexOf("'"+val+"'") > -1); });
+  var p = byId(phones, id), c = choice[id];
+  document.getElementById('memL'+id).textContent = byId(MEM,c.mem).label;
+  document.getElementById('simL'+id).textContent = byId(SIM,c.sim).label;
+  var pr = document.getElementById('pr'+id);
+  pr.textContent = money(priceOf(p,c));
+  pr.classList.remove('tick'); void pr.offsetWidth; pr.classList.add('tick');
+  document.getElementById('mo'+id).textContent = money(Math.ceil(priceOf(p,c)/24));
+}
 
-    function showInsights() {
-        document.getElementById('modal-overlay').style.display = 'flex';
-    }
+function addToCart(e, id){
+  e.stopPropagation();
+  var was = !!cart[id];
+  cart[id] = {mem:choice[id].mem, sim:choice[id].sim};
+  var card = document.getElementById('ph'+id);
+  card.classList.add('in-cart'); card.classList.remove('open');
+  card.querySelector('.add-btn').textContent = 'Update cart';
+  openId = null;
+  if (!was) flyToCart(card);
+  updateCount();
+}
+function removeFromCart(e, id){
+  if (e) e.stopPropagation();
+  delete cart[id];
+  var card = document.getElementById('ph'+id);
+  if (card){ card.classList.remove('in-cart'); card.querySelector('.add-btn').textContent = 'Add to cart'; }
+  updateCount(); renderCart();
+}
 
-    function closeModal() {
-        document.getElementById('modal-overlay').style.display = 'none';
-    }
+function flyToCart(card){
+  var pic = card.querySelector('.shot img, .shot svg'), from = pic.getBoundingClientRect(),
+      to = document.getElementById('cartBtn').getBoundingClientRect();
+  var f = document.createElement('div'); f.className = 'flyer'; f.innerHTML = pic.outerHTML;
+  f.style.left = (from.left + from.width/2 - 22) + 'px'; f.style.top = (from.top + from.height/2 - 40) + 'px';
+  document.body.appendChild(f);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    f.style.transform = 'translate('+(to.left+to.width/2-(from.left+from.width/2))+'px,'+(to.top+to.height/2-(from.top+from.height/2)+18)+'px) scale(.25)';
+    f.style.opacity = '.3';
+  });});
+  setTimeout(function(){ f.remove(); var b = document.getElementById('cartBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }, 700);
+}
+
+function updateCount(){
+  var n = Object.keys(cart).length, c = document.getElementById('count');
+  c.textContent = n; c.classList.toggle('on', n > 0);
+}
+
+function renderCart(){
+  var ids = Object.keys(cart).map(Number);
+  var sub = 0, tot = 0;
+  document.getElementById('cartItems').innerHTML = ids.length ? ids.map(function(id, i){
+    var p = byId(phones, id), c = cart[id], pr = priceOf(p, c), old = oldOf(p, c);
+    sub += old || pr; tot += pr;
+    return '<div class="ci" style="animation-delay:'+(i*60)+'ms"><div class="thumb">'+phoneImg(p)+'</div>' +
+      '<div class="mid"><b>'+p.name+'</b><small>'+byId(MEM,c.mem).label+' · '+p.color+'</small><small>'+byId(SIM,c.sim).label+'</small></div>' +
+      '<div><div class="p">'+money(pr)+'</div><button class="x" onclick="removeFromCart(event,'+id+')">Remove</button></div></div>';
+  }).join('') : '<div class="empty"><div>📱</div>Your cart is empty.<br>Choose a phone and its configuration.</div>';
+  document.getElementById('sub').textContent = money(sub);
+  document.getElementById('save').textContent = '−' + money(sub - tot);
+  document.getElementById('tot').textContent = money(tot);
+  var btn = document.getElementById('checkout');
+  btn.disabled = !ids.length; btn.textContent = ids.length ? 'Checkout · ' + money(tot) : 'Checkout';
+}
+
+function openCart(){ renderCart(); document.getElementById('cart').classList.add('open'); document.getElementById('scrim').classList.add('open'); }
+function closeCart(){ document.getElementById('cart').classList.remove('open'); document.getElementById('scrim').classList.remove('open'); }
+
+function checkout(){
+  if (!Object.keys(cart).length) return;
+  closeCart();
+  var st = document.getElementById('status');
+  st.classList.remove('done');
+  document.getElementById('stTitle').textContent = 'Processing…';
+  document.getElementById('stText').textContent = 'Confirming payment and reserving your phones.';
+  document.getElementById('modal').classList.add('show');
+  setTimeout(function(){
+    st.classList.add('done');
+    document.getElementById('stTitle').textContent = 'Order confirmed';
+    document.getElementById('stText').textContent = 'Order #PH-' + Math.floor(100000 + Math.random()*899999) + ' · Free delivery tomorrow';
+  }, 1800);
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+  cart = {}; updateCount(); rendered = true; render();
+}
+
+render(); updateCount();
 </script>
 </body>
 </html>
